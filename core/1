@@ -1,0 +1,2 @@
+var g = require("./game.js")
+var d = new g.Deck()
