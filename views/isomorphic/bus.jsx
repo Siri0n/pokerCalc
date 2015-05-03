@@ -23,10 +23,11 @@ module.exports = ((function(){
 	}
 	return {
 		connect: function(newBus){
+			console.log("Connected to bus");
 			bus = newBus;
 		},
 		stream: createStreamFactory(),
-		streamVal: createStreamFactory(function(event){
+		streamValue: createStreamFactory(function(event){
 			return event.target.value;
 		})
 	}

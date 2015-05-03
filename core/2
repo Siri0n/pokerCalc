@@ -1,3 +1,0 @@
-var g = require("./game.js")
-var d = new g.Deck()
-g.combination(d.get(7))

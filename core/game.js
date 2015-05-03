@@ -1,138 +1,25 @@
 var _ = require("lodash");
-var suits = [
-	{
-		id: 0,
-		str: "\u2665"
-	},
-	{
-		id: 1,
-		str: "\u2666"
-	},
-	{
-		id: 2,
-		str: "\u2663"
-	},
-	{
-		id: 3,
-		str: "\u2660"
-	}
-];
-
-var values = [
-	{
-		id: 0,
-		str: "2"
-	},
-	{
-		id: 1,
-		str: "3"
-	},
-	{
-		id: 2,
-		str: "4"
-	},
-	{
-		id: 3,
-		str: "5"
-	},
-	{
-		id: 4,
-		str: "6"
-	},
-	{
-		id: 5,
-		str: "7"
-	},
-	{
-		id: 6,
-		str: "8"
-	},
-	{
-		id: 7,
-		str: "9"
-	},
-	{
-		id: 8,
-		str: "10"
-	},
-	{
-		id: 9,
-		str: "J"
-	},
-	{
-		id: 10,
-		str: "Q"
-	},
-	{
-		id: 11,
-		str: "K"
-	},
-	{
-		id: 12,
-		str: "A"
-	},
-];
-
-
-var cardList = _.flatten(
-	suits.map(function(suit){
-		return values.map(function(value){
-			return {
-				suit: suit.id,
-				value: value.id,
-				toString: function(){return value.str + suit.str}
-			}
-		})
-	})
-)
-
-var handList = _.flattenDeep(
-	values.map(
-		function(elem, index){
-			return values.slice(index).map(
-				function(elem2){
-					if(elem.id == elem2.id){
-						return {
-							id: elem.id + "-" + elem2.id,
-							str: elem.str + "-" + elem2.str
-						}
-					}else{
-						return [
-							{
-								id: elem.id + "-" + elem2.id,
-								str: elem.str + "-" + elem2.str
-							},
-							{
-								id: elem.id + "+" + elem2.id,
-								str: elem.str + "+" + elem2.str
-							}
-						]
-					}
-				}
-			)
-		}
-	)
-);
+var types = require("./types");
 
 function Deck(){
-	var cards = _.shuffle(cardList);
-	this.get = function(n){
+	var cards = _.shuffle(types.cardList);
+	this.shuffle = function(){
+		cards = _.shuffle(types.cardList);
+	}
+	this.take = function(n){
 		if(cards.length < n){
-			//throw new Error("Too few cards in deck");
-			console.log("! new deck !");
-			cards = _.shuffle(cardList);
+			throw new Error("Too few cards in deck");
 		}
 		var result = cards.splice(0, n);
-		console.log(result);
 		return result;
 	}
 }
 
 function handType(hand){
-	return hand[0].value + (hand[0].suit == hand[1].suit ? "+" : "-") + hand[1].value;
+	return types.values[Math.max(hand[0].value, hand[1].value)] + 
+		(hand[0].suit == hand[1].suit ? "+" : "-") + 
+		types.values[Math.min(hand[0].value, hand[1].value)];
 }
-
-var combinations = ["nothing", "pair", "two pairs", "set", "straight", "flush", "four", "straight flush"];
 
 function range(n){
 	return _.times(n, function(k){ return k});
@@ -248,16 +135,45 @@ function combination(cards){
 	}
 }
 
-function playGame(players){
-	var deck = new Deck(); //stub
+function combinationToString(c){
+	return types.combinationList.indexOf(c.combination) + c.kickers.map(function(kicker){
+		return "0123456789xyz"[kicker];
+	}).join("");
 }
 
-module.exports = {
-	Deck: Deck,
-	handList: handList,
-	handType: handType,
-	straight: straight,
-	combination: combination,
-	query: query,
-	range: range,
+function playGame(players, rounds){
+	var deck = new Deck();
+	var result = {};
+	_.forEach(types.handList, function(hand){
+		result[hand] = {
+			games: 0,
+			score: 0
+		}
+	})
+	function max(arr){
+		return arr.reduce(function(acc, val){
+			return acc > val ? acc : val; 
+		}, arr[0])
+	}
+	for(var i = 0; i < rounds; i++){
+		deck.shuffle();
+		var playerHands = _.times(players, function(n){
+			return deck.take(2);
+		});
+		var common = deck.take(5);
+		var playerCombos = playerHands.map(function(hand){
+			var c = combination(hand.concat(common));
+			return combinationToString(c);
+		});
+		var winnerCombo = max(playerCombos);
+		var winnerIndex = playerCombos.indexOf(winnerCombo);
+		_.times(players, function(n){
+			var type = handType(playerHands[n]);
+			result[type].games += 1;
+			result[type].score += (n == winnerIndex ? 1 : 0);
+		});
+	}
+	return result;
 }
+
+module.exports = playGame;

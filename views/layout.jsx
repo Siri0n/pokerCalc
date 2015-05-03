@@ -1,5 +1,4 @@
 var React = require("react");
-var Content = require("./isomorphic/content.jsx");
 
 var InitData = React.createClass({
 	render: function(){
@@ -7,25 +6,29 @@ var InitData = React.createClass({
 	}
 });
 
-var Main = React.createClass({
+var Layout = React.createClass({
 	render: function() {
-		var props = this.props;
+		var Content = require(this.props.content);
 		return (
 			<html lang="en">
 				<head>
 					<meta charSet="utf-8"/>
         			<meta httpEquiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
         			<link rel="stylesheet" href="css/style.css"></link>
-					<script src="http://api-maps.yandex.ru/2.1/?lang=ru_RU&load=Map,Placemark"></script>
-					<InitData data={props}/>
-					<script src="js/main.js"></script>
+        			{this.props.styles.map(function(path){
+        				return <link rel="stylesheet" href={path}/>
+        			})}
+        			<InitData data={this.props.data}/>
+        			{this.props.scripts.map(function(path){
+        				return <script type="text/javascript" src={path}/>
+        			})}
 					<title>Test</title>
 				</head>
 				<body>
-					<Content {...props}/>
+					<Content {...this.props.data}/>
 				</body>
 			</html>
 		);
 	}
 });
-module.exports = Main;
+module.exports = Layout;

@@ -1,35 +1,142 @@
 body{
 	width: 100%;
 	min-height: 100vh;
-	background-color: #eee;
+	background-color: #330;
 }
 
 .content{
+	display: flex;
+	background-color: #291;
+	border: 3px solid black;
+	justify-content: center;
+	align-items: flex-start;
 	margin: 50px auto;
 	width: 90%;
-	background-color: #fcc;
 	&>*{
-		margin-left: auto;
-		margin-right: auto;
+		margin: 50px 100px;
 	}
 	.controls {
-		background-color: #faa;
 		text-align: center;
-		padding: 5px;
+		margin-top: 50px;
+		padding: 20px;
+		display: flex;
+		flex-direction: column;
+		justify-content: flex-start;
+		align-items: stretch;
+		&>div{
+			padding: 5px;
+			display: flex;
+			flex-direction: row;
+			justify-content: center;
+		}
 		button{
+			display: block;
 			width: 100px;
-			margin: 10p;
+			margin: 10px;
 			border-radius: 5px;
 			font-size: 1.2em;
+		}
+		label{
+			color: #ffa;
+			text-shadow: 0 0 1px #000;
 		}
 	}
 	table{
 		margin-top: 20px;
-		border: 2px solid #888;
+		border: 2px solid #330;
 		border-collapse: collapse;
 		th, td{
-			border: 1px solid #888;
+			border: 1px solid #330;
+			min-width: 7ch;
+			font-family: monospace;
+			font-size: 1.2;
+			padding: 3px;
+		}
+		td:first-child{
+			background-color: #ff9;
+			min-width: 0 !important;
+			white-space: pre;
+		}
+		th:first-child{
+			background-color: #ccb;
+			min-width: 0;
+		}
+		th:not(:first-child){
+			background-color: #ccc;
+			&.asc{
+				background-color: #cfc;
+			}
+			&.desc{
+				background-color: #fcc;
+			}
+		}
+		td{
+			background-color: #ffa;
+			text-align: right;
 		}
 	}
 }
 
+.menu{
+	position: relative;
+	box-sizing: border-box;
+	background-clip: padding-box;
+	&>div{
+		display: none;
+		flex-direction: column;
+		align-items: stretch;
+		position: absolute;
+		z-index: 10;
+		&>div{
+			margin: 5px;
+			padding: 3px;
+			box-shadow: 5px 5px 2px rgba(0,0,0,0.5);
+			width: auto;
+			background-color: #ccc;
+			white-space: nowrap;
+			border: 1px solid black;
+			border-radius: 5px;
+			cursor: pointer;
+			selection: none;
+			&:hover{
+				background-color: #ddd;
+			}
+		}
+	}
+	&:hover{
+		background-color: #ddd !important;
+		&>div{
+			display: flex !important;
+		}
+	}
+}
+
+.menu-down{
+	&>div{
+		top: 100%;
+		left: 0;
+		&>div{
+			margin-left: 1px !important;
+		}
+	}
+}
+
+.menu-right{
+	&>div{
+		top: 0;
+		left: 100%;
+		&>div:first-child{
+			margin-top: 0 !important;
+		}
+	}
+}
+
+.await{
+	position: fixed;
+	top: 0px;
+	bottom: 0px;
+	left: 0px;
+	right: 0px;
+	margin: 0px;
+	background-color: rgba(255,255,255, 0.5);
+}
